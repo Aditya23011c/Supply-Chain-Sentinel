@@ -1,0 +1,152 @@
+{
+  "name": "Sentinel - Notify Approved Plan",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "notify-approved-plan",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "f47ad6d7-40e2-50f3-836e-b7f5640e9e1b",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "27bf09a3-e3d9-5d8f-b9db-0ea4fa9a34bd"
+    },
+    {
+      "parameters": {
+        "jsCode": "const b = $input.first().json.body;\nconst t = b.terms || {};\nconst lead = Number(t.lead_time_days || 0);\nconst eta = new Date(Date.now() + lead * 86400000).toISOString().slice(0, 10);\nconst po = 'PO-' + new Date().toISOString().slice(0, 10).replace(/-/g, '') + '-' + String(b.plan_id || 'x').slice(-4).toUpperCase();\nconst supplier = t.supplier || b.supplier;\nreturn [{ json: { plan_id: b.plan_id, po_number: po, supplier, quantity: t.quantity, unit_price: t.unit_price, total_cost: t.total_cost,\n  expected_delivery: eta, override: !!b.override,\n  summary: 'Purchase order ' + po + ': ' + t.quantity + ' units from ' + supplier + ', delivery by ' + eta } }];"
+      },
+      "id": "e9a837b1-1582-50e1-a0f1-32e762fb021b",
+      "name": "Build purchase order",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        270,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Webhook').first().json.body.callback_base + '/webhooks/n8n/plan-approved' }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ ...$json, execution_id: String($execution.id) }) }}",
+        "options": {
+          "timeout": 6000
+        }
+      },
+      "id": "ce929150-dab5-50f4-8f68-fc103cb1dac3",
+      "name": "Notify backend",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        540,
+        0
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const b = $('Webhook').first().json.body;\nconst po = $('Build purchase order').first().json;\nreturn [{ json: { ok: true, workflow: 'notify-approved-plan', executionId: String($execution.id), plan_id: b.plan_id, po_number: po.po_number } }];"
+      },
+      "id": "aff1148f-bbbe-5a46-b63c-8304d65c1168",
+      "name": "Build response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        810,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "firstIncomingItem",
+        "options": {}
+      },
+      "id": "8cae12b0-fb21-53b9-b144-b00f0c8f4457",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1080,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Notify Approved Plan\nFires once the Budget Agent approves (or a human overrides). Builds a purchase order and tells the dashboard.\n**For real notifications:** add Gmail / Slack / Telegram / Google Sheets after 'Build purchase order' (fields: po_number, supplier, quantity, total_cost, expected_delivery, summary).",
+        "height": 170,
+        "width": 760
+      },
+      "id": "b028edc2-3348-5be4-9b74-7c8dc93bd2d5",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -230
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Build purchase order",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build purchase order": {
+      "main": [
+        [
+          {
+            "node": "Notify backend",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Notify backend": {
+      "main": [
+        [
+          {
+            "node": "Build response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build response": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true
+  }
+}

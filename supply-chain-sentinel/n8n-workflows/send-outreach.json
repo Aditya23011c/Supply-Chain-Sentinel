@@ -1,0 +1,152 @@
+{
+  "name": "Sentinel - Send Outreach",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "send-outreach",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "6f1d4264-0f4b-5830-ba1d-7aa6e39d5c33",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "808397f2-bc07-5493-99ae-62ed58e72b31"
+    },
+    {
+      "parameters": {
+        "jsCode": "const b = $input.first().json.body;\nconst lines = String(b.draft || '').split('\\n');\nconst subject = (lines[0] || '').replace(/^Subject:\\s*/i, '').trim();\nconst body = lines.slice(1).join('\\n').trim();\nconst t = b.terms || {};\nconst slug = String(t.supplier || 'supplier').toLowerCase().replace(/[^a-z0-9]+/g, '');\nreturn [{ json: { plan_id: b.plan_id, attempt: b.attempt, supplier: t.supplier, to: 'sales@' + slug + '.example', subject, body, sent_at: new Date().toISOString() } }];"
+      },
+      "id": "90a146c5-9168-5291-83d4-3a2001d0bab7",
+      "name": "Compose email",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        270,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Webhook').first().json.body.callback_base + '/webhooks/n8n/outreach-sent' }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ plan_id: $json.plan_id, attempt: $json.attempt, supplier: $json.supplier, to: $json.to, subject: $json.subject, execution_id: String($execution.id) }) }}",
+        "options": {
+          "timeout": 6000
+        }
+      },
+      "id": "aaea3086-a67e-53c1-988f-1bf3e8fcf0e4",
+      "name": "Deliver to supplier inbox",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        540,
+        0
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const b = $('Webhook').first().json.body;\nconst c = $('Compose email').first().json;\nreturn [{ json: { ok: true, workflow: 'send-outreach', executionId: String($execution.id), plan_id: b.plan_id, delivered_to: c.to } }];"
+      },
+      "id": "c87e287d-142f-570e-a7c6-1e664a94520e",
+      "name": "Build response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        810,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "firstIncomingItem",
+        "options": {}
+      },
+      "id": "47ef1119-1a2d-50be-8f93-55e60d7f5228",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1080,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Send Outreach\nThe Negotiation Agent decides WHAT to say; this workflow DELIVERS it.\nCurrently 'delivers' to the dashboard's supplier inbox via the backend callback.\n**For real delivery:** add a Gmail / SMTP / Slack / Telegram node after 'Compose email' (fields available: to, subject, body).",
+        "height": 170,
+        "width": 760
+      },
+      "id": "d2168bd6-c95b-52db-a5f7-656e3136e822",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -230
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Compose email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Compose email": {
+      "main": [
+        [
+          {
+            "node": "Deliver to supplier inbox",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Deliver to supplier inbox": {
+      "main": [
+        [
+          {
+            "node": "Build response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build response": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true
+  }
+}

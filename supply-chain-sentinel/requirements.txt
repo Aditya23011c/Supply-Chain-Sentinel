@@ -1,0 +1,4 @@
+pyyaml
+fastapi
+uvicorn[standard]
+# phase 3+: langgraph

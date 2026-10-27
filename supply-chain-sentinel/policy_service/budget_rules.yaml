@@ -1,0 +1,14 @@
+# Readable policy, modeled on navan.ai-style policy enforcement: every rule has an id and a message.
+rules:
+  - id: MAX_PRICE_MULTIPLIER
+    description: Unit price must not exceed 1.15x the original supplier cost
+    max_multiplier: 1.15
+  - id: MAX_LEAD_TIME
+    description: Replacement lead time must be 14 days or less
+    max_days: 14
+  - id: MIN_RELIABILITY
+    description: Supplier reliability must be at least 0.80
+    min_score: 0.80
+  - id: MAX_TOTAL_SPEND
+    description: Total order cost must not exceed the spend cap
+    cap: 1500000

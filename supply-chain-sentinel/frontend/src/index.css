@@ -1,0 +1,109 @@
+@import "tailwindcss";
+
+@keyframes slide-in { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes shake { 0%,100% { transform: translateX(0); } 20% { transform: translateX(-8px); } 40% { transform: translateX(8px); } 60% { transform: translateX(-5px); } 80% { transform: translateX(5px); } }
+@keyframes flash-red { 0% { box-shadow: 0 0 0 0 rgba(239,68,68,.8); } 100% { box-shadow: 0 0 0 18px rgba(239,68,68,0); } }
+@keyframes pulse-ring { 0%,100% { box-shadow: 0 0 0 0 rgba(56,189,248,.6); } 50% { box-shadow: 0 0 0 8px rgba(56,189,248,0); } }
+
+.anim-slide-in { animation: slide-in .5s ease-out both; }
+.anim-reject { animation: slide-in .4s ease-out both, shake .5s .4s ease-in-out, flash-red 1s .4s ease-out; }
+.anim-active { animation: pulse-ring 1.4s infinite; }
+
+/* ---------- live wallpaper + glass UI ---------- */
+html { scroll-behavior: smooth; }
+body { background: #04060f; }
+
+.aurora { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none;
+  background: radial-gradient(ellipse at 50% -10%, #0c1538 0%, #04060f 62%); }
+.aurora::before, .aurora::after { content: ""; position: absolute; width: 62vmax; height: 62vmax; border-radius: 50%;
+  filter: blur(100px); opacity: .38; animation: drift 24s ease-in-out infinite alternate; }
+.aurora::before { background: radial-gradient(circle, #0ea5e9, transparent 65%); top: -22vmax; left: -12vmax; }
+.aurora::after { background: radial-gradient(circle, #7c3aed, transparent 65%); bottom: -28vmax; right: -16vmax; animation-delay: -9s; }
+.aurora-grid { position: absolute; inset: 0;
+  background-image: linear-gradient(rgba(148,163,184,.07) 1px, transparent 1px), linear-gradient(90deg, rgba(148,163,184,.07) 1px, transparent 1px);
+  background-size: 56px 56px; mask-image: radial-gradient(ellipse at center, black 30%, transparent 78%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 78%); }
+@keyframes drift { from { transform: translate(0,0) scale(1); } to { transform: translate(9vmax,7vmax) scale(1.22); } }
+
+.glass { background: rgba(15,23,42,.48); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(148,163,184,.16); box-shadow: 0 10px 40px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.05); }
+
+.gradient-text { background: linear-gradient(90deg, #38bdf8, #a78bfa, #34d399, #38bdf8); background-size: 250% auto;
+  -webkit-background-clip: text; background-clip: text; color: transparent; animation: shimmer 7s linear infinite; }
+@keyframes shimmer { to { background-position: 250% center; } }
+
+.float { animation: float 4s ease-in-out infinite; }
+@keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-12px); } }
+
+.btn-glow { transition: transform .15s, box-shadow .25s; }
+.btn-glow:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 0 28px rgba(56,189,248,.55); }
+.btn-glow:active:not(:disabled) { transform: translateY(0); }
+
+@media (prefers-reduced-motion: reduce) {
+  .aurora::before, .aurora::after, .gradient-text, .float, .anim-active { animation: none; }
+}
+
+/* =====================================================================
+   CRAFT THEME (Minecraft-inspired, original pixel art) - html.craft
+   ===================================================================== */
+html, body { overflow-x: hidden; }
+.splash { display: none; }
+.mc-dim { position: fixed; inset: 0; z-index: 0; pointer-events: none;
+  background: linear-gradient(rgba(0,0,0,.22), rgba(0,0,0,.5)); }
+
+html.craft { font-size: 18px; }
+html.craft body, html.craft button, html.craft input, html.craft select { font-family: 'VT323', 'Courier New', monospace; }
+html.craft * { border-radius: 0 !important; }
+html.craft h1, html.craft h2, html.craft h3, html.craft .hero-title, html.craft .brand-title { font-family: 'Press Start 2P', 'VT323', monospace; }
+
+/* blocky stone panels */
+html.craft .glass {
+  background-color: #3b3b3b; background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' shape-rendering='crispEdges'><rect x='0' y='0' width='1' height='1' fill='black' fill-opacity='0.22'/><rect x='3' y='0' width='1' height='1' fill='black' fill-opacity='0.22'/><rect x='4' y='0' width='1' height='1' fill='white' fill-opacity='0.12'/><rect x='5' y='0' width='1' height='1' fill='black' fill-opacity='0.22'/><rect x='7' y='0' width='1' height='1' fill='white' fill-opacity='0.08'/><rect x='8' y='0' width='1' height='1' fill='white' fill-opacity='0.12'/><rect x='11' y='0' width='1' height='1' fill='white' fill-opacity='0.08'/><rect x='15' y='0' width='1' height='1' fill='white' fill-opacity='0.05'/><rect x='1' y='1' width='1' height='1' fill='white' fill-opacity='0.05'/><rect x='2' y='1' width='1' height='1' fill='white' fill-opacity='0.05'/><rect x='5' y='1' width='1' height='1' fill='black' fill-opacity='0.22'/><rect x='9' y='1' width='1' height='1' fill='black' fill-opacity='0.22'/><rect x='10' y='1' width='1' height='1' fill='white' fill-opacity='0.12'/><rect x='11' y='1' width='1' height='1' fill='white' fill-opacity='0.12'/><rect x='15' y='1' width='1' height='1' fill='black' fill-opacity='0.1'/><rect x='1' y='2' width='1' height='1' fill='white' fill-opacity='0.12'/><rect x='3' y='2' width='1' height='1' fill='black' fill-opacity='0.16'/><rect x='4' y='2' width='1' height='1' fill='black' fill-opacity='0.1'/><rect x='6' y='2' width='1' height='1' fill='white' fill-opacity='0.05'/><rect x='8' y='2' width='1' height='1' fill='white' fill-opacity='0.08'/><rect x='10' y='2' width='1' height='1' fill='black' fill-opacity='0.1'/><rect x='12' y='2' width='1' height='1' fill='white' fill-opacity='0.12'/><rect x='13' y='2' width='1' height='1' fill='white' fill-opacity='0.05'/><rect x='14' y='2' width='1' height='1' fill='black' fill-opacity='0.1'/><rect x='1' y='3' width='1' height='1' fill='white' fill-opacity='0.05'/><rect x='3' y='3' width='1' height='1' fill='white' fill-opacity='0.08'/><rect x='5' y='3' width='1' height='1' fill='white' fill-opacity='0.12'/><rect x='6' y='3' width='1' height='1' fill='white' fill-opacity='0.12'/><rect x='7' y='3' width='1' height='1' fill='white' fill-opacity='0.12'/><rect x='9' y='3' width='1' height='1' fill='black' fill-opacity='0.16'/><rect x='10' y='3' width='1' height='1' fill='white' fill-opacity='0.08'/><rect x='12' y='3' width='1' height='1' fill='white' fill-opacity='0.12'/><rect x='13' y='3' width='1' height='1' fill='black' fill-opacity='0.1'/><rect x='14' y='3' width='1' height='1' fill='white' fill-opacity='0.08'/><rect x='2' y='4' width='1' height='1' fill='white' fill-opacity='0.05'/><rect x='3' y='4' width='1' height='1' fill='white' fill-opacity='0.08'/><rect x='4' y='4' width='1' height='1' fill='white' fill-opacity='0.12'/><rect x='5' y='4' width='1' height='1' fill='black' fill-opacity='0.16'/><rect x='6' y='4' width='1' height='1' fill='black' fill-opacity='0.1'/><rect x='7' y='4' width='1' height='1' fill='white' fill-opacity='0.12'/><rect x='9' y='4' width='1' height='1' fill='white' fill-opacity='0.08'/><rect x='10' y='4' width='1' height='1' fill='black' fill-opacity='0.16'/><rect x='11' y='4' width='1' height='1' fill='white' fill-opacity='0.12'/><rect x='12' y='4' width='1' height='1' fill='black' fill-opacity='0.22'/><rect x='13' y='4' width='1' height='1' fill='white' fill-opacity='0.08'/><rect x='14' y='4' width='1' height='1' fill='white' fill-opacity='0.05'/><rect x='15' y='4' width='1' height='1' fill='black' fill-opacity='0.1'/><rect x='1' y='5' width='1' height='1' fill='white' fill-opacity='0.05'/><rect x='2' y='5' width='1' height='1' fill='white' fill-opacity='0.12'/><rect x='4' y='5' width='1' height='1' fill='white' fill-opacity='0.08'/><rect x='7' y='5' width='1' height='1' fill='black' fill-opacity='0.1'/><rect x='8' y='5' width='1' height='1' fill='white' fill-opacity='0.12'/><rect x='10' y='5' width='1' height='1' fill='white' fill-opacity='0.12'/><rect x='11' y='5' width='1' height='1' fill='black' fill-opacity='0.16'/><rect x='14' y='5' width='1' height='1' fill='black' fill-opacity='0.1'/><rect x='1' y='6' width='1' height='1' fill='white' fill-opacity='0.08'/><rect x='5' y='6' width='1' height='1' fill='black' fill-opacity='0.1'/><rect x='7' y='6' width='1' height='1' fill='white' fill-opacity='0.08'/><rect x='8' y='6' width='1' height='1' fill='black' fill-opacity='0.1'/><rect x='9' y='6' width='1' height='1' fill='white' fill-opacity='0.08'/><rect x='10' y='6' width='1' height='1' fill='black' fill-opacity='0.22'/><rect x='12' y='6' width='1' height='1' fill='white' fill-opacity='0.05'/><rect x='2' y='7' width='1' height='1' fill='white' fill-opacity='0.05'/><rect x='4' y='7' width='1' height='1' fill='black' fill-opacity='0.16'/><rect x='7' y='7' width='1' height='1' fill='white' fill-opacity='0.12'/><rect x='8' y='7' width='1' height='1' fill='white' fill-opacity='0.05'/><rect x='10' y='7' width='1' height='1' fill='black' fill-opacity='0.1'/><rect x='11' y='7' width='1' height='1' fill='white' fill-opacity='0.12'/><rect x='12' y='7' width='1' height='1' fill='black' fill-opacity='0.1'/><rect x='2' y='8' width='1' height='1' fill='black' fill-opacity='0.22'/><rect x='3' y='8' width='1' height='1' fill='black' fill-opacity='0.1'/><rect x='5' y='8' width='1' height='1' fill='black' fill-opacity='0.1'/><rect x='9' y='8' width='1' height='1' fill='black' fill-opacity='0.22'/><rect x='10' y='8' width='1' height='1' fill='white' fill-opacity='0.05'/><rect x='11' y='8' width='1' height='1' fill='white' fill-opacity='0.12'/><rect x='12' y='8' width='1' height='1' fill='white' fill-opacity='0.08'/><rect x='15' y='8' width='1' height='1' fill='black' fill-opacity='0.22'/><rect x='1' y='9' width='1' height='1' fill='black' fill-opacity='0.16'/><rect x='3' y='9' width='1' height='1' fill='white' fill-opacity='0.12'/><rect x='4' y='9' width='1' height='1' fill='white' fill-opacity='0.12'/><rect x='5' y='9' width='1' height='1' fill='white' fill-opacity='0.05'/><rect x='6' y='9' width='1' height='1' fill='white' fill-opacity='0.12'/><rect x='7' y='9' width='1' height='1' fill='white' fill-opacity='0.12'/><rect x='9' y='9' width='1' height='1' fill='black' fill-opacity='0.1'/><rect x='10' y='9' width='1' height='1' fill='black' fill-opacity='0.1'/><rect x='12' y='9' width='1' height='1' fill='white' fill-opacity='0.05'/><rect x='14' y='9' width='1' height='1' fill='black' fill-opacity='0.16'/><rect x='15' y='9' width='1' height='1' fill='black' fill-opacity='0.1'/><rect x='0' y='10' width='1' height='1' fill='black' fill-opacity='0.22'/><rect x='1' y='10' width='1' height='1' fill='white' fill-opacity='0.12'/><rect x='2' y='10' width='1' height='1' fill='black' fill-opacity='0.1'/><rect x='4' y='10' width='1' height='1' fill='black' fill-opacity='0.22'/><rect x='6' y='10' width='1' height='1' fill='white' fill-opacity='0.05'/><rect x='7' y='10' width='1' height='1' fill='black' fill-opacity='0.1'/><rect x='10' y='10' width='1' height='1' fill='white' fill-opacity='0.05'/><rect x='11' y='10' width='1' height='1' fill='white' fill-opacity='0.08'/><rect x='12' y='10' width='1' height='1' fill='white' fill-opacity='0.05'/><rect x='14' y='10' width='1' height='1' fill='black' fill-opacity='0.22'/><rect x='15' y='10' width='1' height='1' fill='black' fill-opacity='0.16'/><rect x='3' y='11' width='1' height='1' fill='black' fill-opacity='0.1'/><rect x='4' y='11' width='1' height='1' fill='white' fill-opacity='0.12'/><rect x='5' y='11' width='1' height='1' fill='white' fill-opacity='0.12'/><rect x='6' y='11' width='1' height='1' fill='black' fill-opacity='0.16'/><rect x='7' y='11' width='1' height='1' fill='black' fill-opacity='0.22'/><rect x='8' y='11' width='1' height='1' fill='white' fill-opacity='0.05'/><rect x='9' y='11' width='1' height='1' fill='black' fill-opacity='0.1'/><rect x='10' y='11' width='1' height='1' fill='white' fill-opacity='0.08'/><rect x='11' y='11' width='1' height='1' fill='white' fill-opacity='0.05'/><rect x='14' y='11' width='1' height='1' fill='white' fill-opacity='0.05'/><rect x='4' y='12' width='1' height='1' fill='white' fill-opacity='0.08'/><rect x='5' y='12' width='1' height='1' fill='white' fill-opacity='0.12'/><rect x='6' y='12' width='1' height='1' fill='white' fill-opacity='0.08'/><rect x='8' y='12' width='1' height='1' fill='white' fill-opacity='0.05'/><rect x='9' y='12' width='1' height='1' fill='white' fill-opacity='0.08'/><rect x='14' y='12' width='1' height='1' fill='white' fill-opacity='0.12'/><rect x='0' y='13' width='1' height='1' fill='white' fill-opacity='0.12'/><rect x='1' y='13' width='1' height='1' fill='black' fill-opacity='0.16'/><rect x='2' y='13' width='1' height='1' fill='black' fill-opacity='0.22'/><rect x='4' y='13' width='1' height='1' fill='white' fill-opacity='0.12'/><rect x='9' y='13' width='1' height='1' fill='black' fill-opacity='0.22'/><rect x='11' y='13' width='1' height='1' fill='white' fill-opacity='0.12'/><rect x='13' y='13' width='1' height='1' fill='white' fill-opacity='0.05'/><rect x='3' y='14' width='1' height='1' fill='black' fill-opacity='0.22'/><rect x='5' y='14' width='1' height='1' fill='black' fill-opacity='0.1'/><rect x='6' y='14' width='1' height='1' fill='white' fill-opacity='0.08'/><rect x='9' y='14' width='1' height='1' fill='black' fill-opacity='0.1'/><rect x='10' y='14' width='1' height='1' fill='white' fill-opacity='0.05'/><rect x='11' y='14' width='1' height='1' fill='black' fill-opacity='0.1'/><rect x='12' y='14' width='1' height='1' fill='white' fill-opacity='0.08'/><rect x='15' y='14' width='1' height='1' fill='black' fill-opacity='0.22'/><rect x='3' y='15' width='1' height='1' fill='black' fill-opacity='0.16'/><rect x='7' y='15' width='1' height='1' fill='black' fill-opacity='0.22'/><rect x='8' y='15' width='1' height='1' fill='black' fill-opacity='0.22'/><rect x='10' y='15' width='1' height='1' fill='white' fill-opacity='0.12'/><rect x='13' y='15' width='1' height='1' fill='black' fill-opacity='0.16'/></svg>"); background-size: 64px 64px; image-rendering: pixelated;
+  backdrop-filter: none; -webkit-backdrop-filter: none; border: 4px solid #121212;
+  box-shadow: inset 4px 4px 0 rgba(255,255,255,.20), inset -4px -4px 0 rgba(0,0,0,.50), 6px 6px 0 rgba(0,0,0,.40);
+}
+/* header = grass block edge */
+html.craft header.glass { border-width: 0 0 6px 0; border-color: #5fa83a;
+  box-shadow: 0 6px 0 #6e4b2a, 0 12px 0 rgba(0,0,0,.4); }
+html.craft section.glass > h2 { color: #ffe14d !important; font-size: .62rem; letter-spacing: 0; line-height: 1.6; }
+html.craft section.glass > h2 > span { background: #ffe14d !important; }
+
+/* titles: white block text with hard shadow (no gradients) */
+html.craft .gradient-text { background: none !important; -webkit-text-fill-color: #fff; color: #fff; animation: none;
+  text-shadow: 3px 3px 0 #3a3a3a; }
+html.craft .hero-title { font-size: clamp(1.1rem, 4.4vw, 2.5rem) !important; line-height: 1.6 !important; text-shadow: 4px 4px 0 #2a2a2a; }
+html.craft .brand-title { font-size: clamp(.7rem, 2.6vw, 1rem) !important; line-height: 1.5 !important; }
+html.craft .hero-copy { color: #fff !important; text-shadow: 2px 2px 0 #000; font-size: 1.25rem; }
+html.craft .float { animation: float 3s steps(4) infinite; filter: drop-shadow(4px 4px 0 rgba(0,0,0,.4)); }
+html.craft .anim-slide-in { animation-timing-function: steps(6, end); }
+
+/* the yellow "splash" tagline */
+html.craft .splash { display: block; margin-top: 22px; color: #ffff55; font-family: 'Press Start 2P', monospace;
+  font-size: clamp(.5rem, 1.8vw, .8rem); text-shadow: 2px 2px 0 #3f3f15; transform: rotate(-4deg);
+  animation: splash 1s ease-in-out infinite alternate; }
+@keyframes splash { from { transform: rotate(-4deg) scale(1); } to { transform: rotate(-4deg) scale(1.12); } }
+
+/* buttons: chunky bevel, press-down feel */
+html.craft .btn-glow { background-image: none !important; background-color: #7d7d7d !important; color: #fff !important;
+  text-shadow: 2px 2px 0 #3e3e3e; border: 3px solid #000 !important; transition: none; transform: none !important;
+  box-shadow: inset 3px 3px 0 #c4c4c4, inset -3px -3px 0 #4b4b4b !important; }
+html.craft .btn-glow.from-sky-400, html.craft .btn-glow.bg-emerald-400 { background-color: #5a9c3a !important;
+  box-shadow: inset 3px 3px 0 #94d46e, inset -3px -3px 0 #346420 !important; }
+html.craft .btn-glow.from-amber-400 { background-color: #c8862a !important;
+  box-shadow: inset 3px 3px 0 #f0c070, inset -3px -3px 0 #7c4f12 !important; }
+html.craft .btn-glow:hover:not(:disabled) { filter: brightness(1.18); }
+html.craft .btn-glow:active:not(:disabled) { box-shadow: inset 3px 3px 0 #4b4b4b, inset -3px -3px 0 #c4c4c4 !important; }
+
+/* inputs: black text-field look */
+html.craft input, html.craft select { background: #0d0d0d !important; border: 3px solid #8b8b8b !important; color: #fff !important; box-shadow: none !important; outline: none; }
+html.craft input:focus, html.craft select:focus { border-color: #fff !important; }
+html.craft .anim-active { animation: none; box-shadow: 0 0 0 3px #ffe14d; }
+
+@media (max-width: 640px) {
+  html.craft { font-size: 16px; }
+  html.craft .glass { box-shadow: inset 3px 3px 0 rgba(255,255,255,.2), inset -3px -3px 0 rgba(0,0,0,.5), 4px 4px 0 rgba(0,0,0,.4); }
+}
+@media (prefers-reduced-motion: reduce) { html.craft .splash, html.craft .float { animation: none; } }
+
+html.craft .btn-glow.from-violet-400 { background-color: #7b5cc4 !important;
+  box-shadow: inset 3px 3px 0 #b49cf0, inset -3px -3px 0 #46308a !important; }

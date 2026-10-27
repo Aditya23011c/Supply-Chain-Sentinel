@@ -1,0 +1,152 @@
+{
+  "name": "Sentinel - Trigger Budget Review",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "trigger-budget-review",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "f63902d7-1b34-5cc2-bda5-1e2aa0c0aeb9",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "webhookId": "54c339ec-506b-50ea-83cb-daad46fa4c4f"
+    },
+    {
+      "parameters": {
+        "jsCode": "const b = $input.first().json.body;\nconst t = b.terms || {};\nconst total = Number(t.total_cost || 0);\nreturn [{ json: {\n  ticket: 'REV-' + String(b.plan_id || 'x').slice(-6).toUpperCase() + '-' + (b.attempt || 1),\n  priority: total > 1500000 ? 'HIGH' : total > 800000 ? 'MEDIUM' : 'LOW',\n  total_cost: total\n} }];"
+      },
+      "id": "081ad116-07d0-5bde-b32f-895fad5c281c",
+      "name": "Open review ticket",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        270,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $('Webhook').first().json.body.callback_base + '/api/policy/review' }}",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ terms: $('Webhook').first().json.body.terms }) }}",
+        "options": {
+          "timeout": 6000
+        }
+      },
+      "id": "d59532d9-d5e8-5803-89a1-551c837ad0be",
+      "name": "Policy check",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        540,
+        0
+      ],
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const b = $('Webhook').first().json.body;\nconst tk = $('Open review ticket').first().json;\nconst r = $input.first().json || {};\nconst decided = r.decision === 'approve' || r.decision === 'reject';\nreturn [{ json: decided\n  ? { ok: true, workflow: 'trigger-budget-review', executionId: String($execution.id), plan_id: b.plan_id, attempt: b.attempt,\n      ticket: tk.ticket, priority: tk.priority, decision: r.decision, reason: r.reason, policy_rule_applied: r.policy_rule_applied }\n  : { ok: false, workflow: 'trigger-budget-review', executionId: String($execution.id), plan_id: b.plan_id, attempt: b.attempt,\n      ticket: tk.ticket, error: 'policy service did not answer' } }];"
+      },
+      "id": "47b59335-4c5f-55cc-8d4d-b68eb1b777a1",
+      "name": "Build response",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        810,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "firstIncomingItem",
+        "options": {}
+      },
+      "id": "a15a00eb-ef09-5ccd-bf66-3f8fc7ca76a7",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        1080,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Trigger Budget Review\nn8n opens a review ticket, asks the Budget Agent's policy service (POST /api/policy/review) to evaluate the proposed terms against budget_rules.yaml, and returns the decision.\nIf the policy service is unreachable, 'ok' is false and the orchestrator falls back to its local copy of the same policy - the demo never stalls.\n**Extend it:** add a Slack/Email node after 'Policy check' to ping a human approver for HIGH-priority tickets.",
+        "height": 190,
+        "width": 820
+      },
+      "id": "73d85644-aaf4-5d48-94d5-b5c3ac57e45d",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -250
+      ]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Open review ticket",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Open review ticket": {
+      "main": [
+        [
+          {
+            "node": "Policy check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Policy check": {
+      "main": [
+        [
+          {
+            "node": "Build response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build response": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": true
+  }
+}

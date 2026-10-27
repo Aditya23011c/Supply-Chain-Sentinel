@@ -1,0 +1,7 @@
+[
+  {"supplier_id": "S1", "name": "AeroLink Components", "location": "Singapore", "category": "electronic-components", "unit_price": 142, "lead_time_days": 4,  "reliability": 0.95},
+  {"supplier_id": "S2", "name": "Pacific Micro Systems", "location": "Colombo", "category": "electronic-components", "unit_price": 112, "lead_time_days": 9,  "reliability": 0.90},
+  {"supplier_id": "S3", "name": "Delta Circuits FZE", "location": "Dubai", "category": "electronic-components", "unit_price": 108, "lead_time_days": 16, "reliability": 0.85},
+  {"supplier_id": "S4", "name": "Orion Electronics", "location": "Ho Chi Minh City", "category": "electronic-components", "unit_price": 98, "lead_time_days": 21, "reliability": 0.70},
+  {"supplier_id": "S5", "name": "Kumar Fasteners", "location": "Ludhiana", "category": "hardware", "unit_price": 42, "lead_time_days": 5, "reliability": 0.88}
+]
